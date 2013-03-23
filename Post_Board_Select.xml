@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<id>[SiNaN]:Post_Board_Select</id>
+	<version>2.0</version>
+	<file name="CONTROLLERDIR/Post.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[	// Replying to a topic?]]></search>
+			<add><![CDATA[	//Do we need to set the board?
+	if(!empty($_POST['post_board']))
+		$board = (int) $_POST['post_board'];
+
+	// Replying to a topic?]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	// Previewing, modifying, or posting?]]></search>
+			<add><![CDATA[	//Just need for new topics.
+	if(empty($topic)) {
+		// Get a list of boards they can post in.
+		$boards = boardsAllowedTo('post_new');
+		if (empty($boards))
+			fatal_lang_error('cannot_post_new');
+			
+		$request = $smcFunc['db_query']('', '
+			SELECT c.name AS catName, c.id_cat, b.id_board, b.name AS boardName, b.child_level
+			FROM {db_prefix}boards AS b
+				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
+			WHERE {query_see_board} ' . (in_array(0, $boards) ? '' : '
+				AND b.id_board IN (' . implode(', ', $boards) . ')'). 
+				'AND b.redirect = {string:empty}', array(
+				'empty' => ''
+				)
+			);
+		$context['post_boards'] = array();
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			//Build up the array.
+			$context['post_boards'][] = array(
+				'id' => $row['id_board'],
+				'name' => $row['boardName'],
+				'childLevel' => $row['child_level'],
+				'selected' => $board == $row['id_board'],
+				'cat' => array(
+					'id' => $row['id_cat'],
+					'name' => $row['catName']
+				)
+			);
+		$smcFunc['db_free_result']($request);
+	}
+
+	// Previewing, modifying, or posting?]]></add>
+		</operation>
+	</file>
+	<file name="$themedir/Post.template.php">
+		<operation>
+			<search position="replace"><![CDATA[	// Now show the subject box for this post.]]></search>
+			<add><![CDATA[	//If we have the board list, let them choose.
+	if(!empty($context['post_boards'])) {
+	echo '					
+						<dt> <span id="caption_board"> ', $txt['board_name'], ':</span>
+						</dt>
+						<dd>
+							<input type="hidden" name="post_board" value="', $context['current_board'], '" />
+							<select name="post_board" id="post_board_select">';
+							foreach ($context['post_boards'] as $board) {
+								$is_board = 0;
+							if($board['id'] == $context['current_board'])
+									$is_board = 1;
+									echo '
+										<option value="', $board['id'], '"',  $board['selected'] ? ' selected="selected"' : '', '>', $board['cat']['name'], ' - ', $board['name'], '</option>';
+								}
+							echo '</select>
+						</dd>';
+	}
+
+	// Now show the subject box for this post.]]></add>
+		</operation>
+	</file>
+</modification>

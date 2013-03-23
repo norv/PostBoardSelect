@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>[SiNaN]:Post_Board_Select</id>
+	<name>Post_Board_Select</name>
+	<version>2.0</version>
+	<type>modification</type>
+	<install for="1.0 Alpha">
+		<readme parsebbc="true">readme.txt</readme>
+		<modification>Post_Board_Select.xml</modification>
+	</install>
+	<install for="2.0 RC3, 2.0 RC4, 2.0 RC5, 2.0 - 2.0.99">
+		<readme inline="true">Newer versions of this add-on no longer work for SMF. Please use a pre-2.0 version or upgrade to ElkArte to use the functionality it provides.</readme>
+	</install>
+	<uninstall for="2.0 RC3, 2.0 RC4, 2.0 RC5, 2.0 - 2.0.99">
+		<modification reverse="true">Post_Board_Select_SMF2.x.xml</modification>
+	</uninstall>
+	<install for="1.1.0 - 1.1.99">
+		<readme inline="true">Newer versions of this add-on no longer work for SMF. Please use a pre-2.0 version or upgrade to ElkArte to use the functionality it provides.</readme>
+	</install>
+</package-info>
